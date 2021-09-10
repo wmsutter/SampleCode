@@ -5,19 +5,21 @@ import sys
 from subprocess import Popen
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek to 00
-GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek to 55
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek to 65
-GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP) #secret quit player
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek to 00m
+GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek to 55m
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek to 65m
+GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP) #quit player
 GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP) #play/pause
 GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek to 70m0.5s
-GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek fwd 1 min
-GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek bwd 1 min
-GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)  #seek fwd 5 min
-GPIO.setup(6, GPIO.IN, pull_up_down=GPIO.PUD_UP)  #seek bwd 5 min
+GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek fwd 1m
+GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP) #seek bwd 1m
+GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)  #seek fwd 5m
+GPIO.setup(6, GPIO.IN, pull_up_down=GPIO.PUD_UP)  #seek bwd 5m
 
+#filepath for movie
 movie1 = ("/home/pi/Videos/MoonriseTimerAndCredits.mov")
 
+#initialize status variables
 last_state00 = True
 last_state55 = True
 last_state65 = True
@@ -40,12 +42,12 @@ input_stateB1 = True
 input_stateF5 = True
 input_stateB5 = True
 
-#open player, wait 5s
+#open video player, wait 5s
 omxc = Popen(['omxplayer','-l 00:00:00','--no-osd','--loop',movie1])
 video_open = True
 time.sleep(5)
 
-#seek to 0, wait 1s, pause
+#seek to 0s, wait 1s, then pause
 os.system('dbuscontrol.sh setposition 0')
 time.sleep(0.1)
 os.system('dbuscontrol.sh pause')
@@ -175,7 +177,7 @@ while True:
             os.system('dbuscontrol.sh seek -300000000')
             time.sleep(0.01)
 
-    #if GPIO(24) is grounded, bust outta there
+    #if GPIO(24) is grounded, exit video player
     if (input_stateQ != last_stateQ and not input_stateQ):
         time.sleep(0.1)
         input_stateQ = GPIO.input(24)
@@ -188,7 +190,7 @@ while True:
             time.sleep(0.1)
             video_open = False
 
-    #if GPIO(22) is grounded, pause / unpause
+    #if GPIO(22) is grounded, toggle between pause / play
     if (input_stateP != last_stateP and not input_stateP):
         if paused:
             os.system('dbuscontrol.sh pause')
@@ -199,7 +201,7 @@ while True:
             time.sleep(0.005)
             paused = True
 
-    #Set last input states
+    #Update most recent input states
     last_state00 = input_state00
     last_state55 = input_state55
     last_state65 = input_state65
