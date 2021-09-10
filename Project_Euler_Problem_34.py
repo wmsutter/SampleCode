@@ -22,15 +22,27 @@ def isfactsum(n):
   else:
     return 0
 
-# I determine the highest number this 
-# could possibly be true for.
-b = math.factorial(9)*7
-factsum = 0
+# I determine the highest number that 
+# could possibly be a sum of the factorial
+# of its digits.
+j = 1
+n = 0
+while True:
+  b = math.factorial(9)*j
+  n = n + 9 * (10**(j-1))
+  print(b)
+  print(n)
+  if b < n:
+    break
+  else:
+    j += 1
+
 
 # I test all numbers lower than my
 # calculated upper bound and add them
 # to my running sum, also printing each
 # valid value as a sanity check.
+factsum = 0
 for i in range(10,b):
   if isfactsum(i):
     factsum = factsum + i
